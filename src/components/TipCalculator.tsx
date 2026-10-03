@@ -13,6 +13,10 @@ export function TipCalculator(): JSX.Element {
   const { touched, markTouched } = useTouchedFields();
 
   const outcome = calculateTip(raw);
+  const errors = outcome.ok ? {} : outcome.errors;
+
+  const ariaInvalid = (field: FieldName): 'true' | undefined =>
+    errors[field] ? 'true' : undefined;
 
   const handleChange =
     (field: FieldName) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +52,7 @@ export function TipCalculator(): JSX.Element {
               placeholder="0,00"
               value={raw.bill}
               onChange={handleChange('bill')}
+              aria-invalid={ariaInvalid('bill')}
             />
             <span className="field-suffix" aria-hidden="true">
               €
@@ -69,6 +74,7 @@ export function TipCalculator(): JSX.Element {
               placeholder="10"
               value={raw.tipPercent}
               onChange={handleChange('tipPercent')}
+              aria-invalid={ariaInvalid('tipPercent')}
             />
             <span className="field-suffix" aria-hidden="true">
               %
@@ -90,15 +96,13 @@ export function TipCalculator(): JSX.Element {
               placeholder="1"
               value={raw.people}
               onChange={handleChange('people')}
+              aria-invalid={ariaInvalid('people')}
             />
           </div>
         </div>
       </div>
 
-      <FieldErrors
-        errors={outcome.ok ? {} : outcome.errors}
-        touched={touched}
-      />
+      <FieldErrors errors={errors} touched={touched} />
 
       <ResultPanel outcome={outcome} />
     </section>
