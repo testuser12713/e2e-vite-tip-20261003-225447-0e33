@@ -1,16 +1,23 @@
 import { formatEuro } from '../calc';
 import type { CalcOutcome } from '../types';
 
-const DASH = '—';
-
 export function ResultPanel(props: { outcome: CalcOutcome }): JSX.Element {
   const { outcome } = props;
+  const hasResult = outcome.ok;
 
-  const tipValue = outcome.ok ? formatEuro(outcome.result.tipCents) : DASH;
-  const totalValue = outcome.ok ? formatEuro(outcome.result.totalCents) : DASH;
-  const perPersonValue = outcome.ok
+  const tipValue = hasResult
+    ? formatEuro(outcome.result.tipCents)
+    : formatEuro(0);
+  const totalValue = hasResult
+    ? formatEuro(outcome.result.totalCents)
+    : formatEuro(0);
+  const perPersonValue = hasResult
     ? formatEuro(outcome.result.perPersonCents)
-    : DASH;
+    : formatEuro(0);
+
+  const valueClass = hasResult
+    ? 'result-row__value'
+    : 'result-row__value is-placeholder';
 
   return (
     <section className="results" aria-label="Ergebnisse">
@@ -18,17 +25,22 @@ export function ResultPanel(props: { outcome: CalcOutcome }): JSX.Element {
       <div className="results__rows">
         <div className="result-row">
           <span className="result-row__label">Trinkgeld</span>
-          <span className="result-row__value">{tipValue}</span>
+          <span className={valueClass}>{tipValue}</span>
         </div>
         <div className="result-row">
           <span className="result-row__label">Gesamt</span>
-          <span className="result-row__value">{totalValue}</span>
+          <span className={valueClass}>{totalValue}</span>
         </div>
         <div className="result-row result-row--emphasis">
           <span className="result-row__label">pro Person</span>
-          <span className="result-row__value">{perPersonValue}</span>
+          <span className={valueClass}>{perPersonValue}</span>
         </div>
       </div>
+      {!hasResult && (
+        <p className="results__notice" role="status" aria-live="polite">
+          Behebe das markierte Feld, um die Ergebnisse zu sehen.
+        </p>
+      )}
     </section>
   );
 }

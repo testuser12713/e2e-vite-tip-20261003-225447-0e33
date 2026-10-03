@@ -1,9 +1,25 @@
+import { useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { calculateTip } from '../calc';
+import type { FieldName, RawInput } from '../types';
 import { useTouchedFields } from '../hooks/useTouchedFields';
 import { FieldErrors } from './FieldErrors';
 import { ResultPanel } from './ResultPanel';
 
+const INITIAL_INPUT: RawInput = { bill: '', tipPercent: '', people: '' };
+
 export function TipCalculator(): JSX.Element {
-  const { touched } = useTouchedFields();
+  const [raw, setRaw] = useState<RawInput>(INITIAL_INPUT);
+  const { touched, markTouched } = useTouchedFields();
+
+  const outcome = calculateTip(raw);
+
+  const handleChange =
+    (field: FieldName) => (event: ChangeEvent<HTMLInputElement>) => {
+      const nextValue = event.target.value;
+      setRaw((previous) => ({ ...previous, [field]: nextValue }));
+      markTouched(field);
+    };
 
   return (
     <section className="calculator" aria-labelledby="calculator-title">
@@ -30,9 +46,8 @@ export function TipCalculator(): JSX.Element {
               type="text"
               inputMode="decimal"
               placeholder="0,00"
-              value=""
-              readOnly
-              disabled
+              value={raw.bill}
+              onChange={handleChange('bill')}
             />
             <span className="field-suffix" aria-hidden="true">
               €
@@ -52,9 +67,8 @@ export function TipCalculator(): JSX.Element {
               type="text"
               inputMode="decimal"
               placeholder="10"
-              value=""
-              readOnly
-              disabled
+              value={raw.tipPercent}
+              onChange={handleChange('tipPercent')}
             />
             <span className="field-suffix" aria-hidden="true">
               %
@@ -74,17 +88,19 @@ export function TipCalculator(): JSX.Element {
               type="text"
               inputMode="numeric"
               placeholder="1"
-              value=""
-              readOnly
-              disabled
+              value={raw.people}
+              onChange={handleChange('people')}
             />
           </div>
         </div>
       </div>
 
-      <FieldErrors errors={{}} touched={touched} />
+      <FieldErrors
+        errors={outcome.ok ? {} : outcome.errors}
+        touched={touched}
+      />
 
-      <ResultPanel outcome={{ ok: false, errors: {} }} />
+      <ResultPanel outcome={outcome} />
     </section>
   );
 }

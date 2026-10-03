@@ -276,6 +276,16 @@ body {
   color: var(--color-accent);
 }
 
+.results__rows .result-row__value.is-placeholder {
+  color: var(--color-fgMuted);
+}
+
+.results__notice {
+  margin: var(--space-3) 0 0;
+  font-size: var(--size-label);
+  color: var(--color-fgMuted);
+}
+
 @media (min-width: 640px) {
   .app {
     padding: var(--space-6) var(--space-4);
