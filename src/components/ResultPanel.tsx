@@ -1,10 +1,19 @@
 import { formatEuro } from '../calc';
-import type { CalcOutcome } from '../types';
+import type { CalcOutcome, FieldName } from '../types';
 
-export function ResultPanel(props: { outcome: CalcOutcome }): JSX.Element {
-  const { outcome } = props;
+const FIELD_ORDER: FieldName[] = ['bill', 'tipPercent', 'people'];
+
+export function ResultPanel(props: {
+  outcome: CalcOutcome;
+  touched: Partial<Record<FieldName, boolean>>;
+}): JSX.Element {
+  const { outcome, touched } = props;
   const hasResult = outcome.ok;
-  const hasErrors = !outcome.ok && Object.keys(outcome.errors).length > 0;
+  const hasErrors =
+    !outcome.ok &&
+    FIELD_ORDER.some(
+      (field) => touched[field] === true && Boolean(outcome.errors[field]),
+    );
 
   const tipValue = hasResult
     ? formatEuro(outcome.result.tipCents)
