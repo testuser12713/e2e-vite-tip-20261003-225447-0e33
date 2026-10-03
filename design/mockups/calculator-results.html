@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trinkgeld-Rechner — Ergebniszustand</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page" data-od-id="results-page">
+    <section class="card" data-od-id="calculator-card">
+      <header class="card-header">
+        <h1 class="card-title" data-od-id="calculator-title">Trinkgeld-Rechner</h1>
+        <p class="card-subtitle">Betrag, Trinkgeld und Personenzahl — Ergebnisse aktualisieren sich während der Eingabe.</p>
+      </header>
+
+      <div class="fields">
+        <div class="field" data-od-id="field-amount">
+          <label class="field-label" for="amount">Betrag</label>
+          <div class="input-wrap">
+            <input class="input input--with-unit" id="amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0,00" value="100" aria-describedby="amount-message" aria-invalid="false" data-od-id="input-amount">
+            <span class="input-unit" aria-hidden="true">€</span>
+          </div>
+          <div class="field-message" id="amount-message" role="alert" aria-live="polite"></div>
+        </div>
+
+        <div class="field" data-od-id="field-percent">
+          <label class="field-label" for="percent">Trinkgeld (%)</label>
+          <div class="input-wrap">
+            <input class="input input--with-unit" id="percent" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="10" value="10" aria-describedby="percent-message" aria-invalid="false" data-od-id="input-percent">
+            <span class="input-unit" aria-hidden="true">%</span>
+          </div>
+          <div class="field-message" id="percent-message" role="alert" aria-live="polite"></div>
+        </div>
+
+        <div class="field" data-od-id="field-people">
+          <label class="field-label" for="people">Personenzahl</label>
+          <div class="input-wrap">
+            <input class="input" id="people" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="1" value="2" aria-describedby="people-message" aria-invalid="false" data-od-id="input-people">
+          </div>
+          <div class="field-message" id="people-message" role="alert" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <section class="results" data-od-id="results-panel">
+        <h2 class="results-heading">Ergebnisse</h2>
+        <div class="result-rows">
+          <div class="result-row" data-od-id="result-row-tip">
+            <span class="result-label">Trinkgeld</span>
+            <span class="result-value"><span class="result-num">10,00</span><span class="result-currency">€</span></span>
+          </div>
+          <div class="result-row" data-od-id="result-row-total">
+            <span class="result-label">Gesamtbetrag</span>
+            <span class="result-value"><span class="result-num">110,00</span><span class="result-currency">€</span></span>
+          </div>
+          <div class="result-row result-row--emphasis" data-od-id="result-row-per-person">
+            <span class="result-label">Pro Person</span>
+            <span class="result-value"><span class="result-num">55,00</span><span class="result-currency">€</span></span>
+          </div>
+        </div>
+        <p class="results-notice" role="status" aria-live="polite" hidden>Behebe das markierte Feld, um die Ergebnisse zu sehen.</p>
+      </section>
+
+      <p class="status-line">Aktualisiert sich während der Eingabe.</p>
+    </section>
+
+    <nav class="review-nav" aria-label="Mockup views">
+      <ul class="review-nav-list">
+        <li><a class="review-nav-link" href="index.html">Übersicht</a></li>
+        <li><a class="review-nav-link" href="calculator-initial.html">Initial</a></li>
+        <li><a class="review-nav-link" href="calculator-results.html" aria-current="page">Ergebnisse</a></li>
+        <li><a class="review-nav-link" href="calculator-errors.html">Fehler</a></li>
+        <li><a class="review-nav-link" href="calculator.html">Interaktiv</a></li>
+      </ul>
+    </nav>
+  </main>
+</body>
+</html>

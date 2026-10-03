@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trinkgeld-Rechner — interaktiv</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page" data-od-id="calculator-page">
+    <section class="card" data-od-id="calculator-card">
+      <header class="card-header">
+        <h1 class="card-title" data-od-id="calculator-title">Trinkgeld-Rechner</h1>
+        <p class="card-subtitle">Betrag, Trinkgeld und Personenzahl — Ergebnisse aktualisieren sich während der Eingabe.</p>
+      </header>
+
+      <div class="fields">
+        <div class="field" data-od-id="field-amount">
+          <label class="field-label" for="amount">Betrag</label>
+          <div class="input-wrap">
+            <input class="input input--with-unit" id="amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="0,00" aria-describedby="amount-message" aria-invalid="false" data-od-id="input-amount">
+            <span class="input-unit" aria-hidden="true">€</span>
+          </div>
+          <div class="field-message" id="amount-message" role="alert" aria-live="polite"></div>
+        </div>
+
+        <div class="field" data-od-id="field-percent">
+          <label class="field-label" for="percent">Trinkgeld (%)</label>
+          <div class="input-wrap">
+            <input class="input input--with-unit" id="percent" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="10" aria-describedby="percent-message" aria-invalid="false" data-od-id="input-percent">
+            <span class="input-unit" aria-hidden="true">%</span>
+          </div>
+          <div class="field-message" id="percent-message" role="alert" aria-live="polite"></div>
+        </div>
+
+        <div class="field" data-od-id="field-people">
+          <label class="field-label" for="people">Personenzahl</label>
+          <div class="input-wrap">
+            <input class="input" id="people" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="1" aria-describedby="people-message" aria-invalid="false" data-od-id="input-people">
+          </div>
+          <div class="field-message" id="people-message" role="alert" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <section class="results" data-od-id="results-panel">
+        <h2 class="results-heading">Ergebnisse</h2>
+        <div class="result-rows" id="result-rows">
+          <div class="result-row" data-od-id="result-row-tip">
+            <span class="result-label">Trinkgeld</span>
+            <span class="result-value is-placeholder" id="tip-value"><span class="result-num" id="tip-num">0,00</span><span class="result-currency">€</span></span>
+          </div>
+          <div class="result-row" data-od-id="result-row-total">
+            <span class="result-label">Gesamtbetrag</span>
+            <span class="result-value is-placeholder" id="total-value"><span class="result-num" id="total-num">0,00</span><span class="result-currency">€</span></span>
+          </div>
+          <div class="result-row result-row--emphasis" data-od-id="result-row-per-person">
+            <span class="result-label">Pro Person</span>
+            <span class="result-value is-placeholder" id="perperson-value"><span class="result-num" id="perperson-num">0,00</span><span class="result-currency">€</span></span>
+          </div>
+        </div>
+        <p class="results-notice" id="results-notice" role="status" aria-live="polite" hidden>Behebe das markierte Feld, um die Ergebnisse zu sehen.</p>
+      </section>
+
+      <p class="status-line">Aktualisiert sich während der Eingabe.</p>
+    </section>
+
+    <nav class="review-nav" aria-label="Mockup views">
+      <ul class="review-nav-list">
+        <li><a class="review-nav-link" href="index.html">Übersicht</a></li>
+        <li><a class="review-nav-link" href="calculator-initial.html">Initial</a></li>
+        <li><a class="review-nav-link" href="calculator-results.html">Ergebnisse</a></li>
+        <li><a class="review-nav-link" href="calculator-errors.html">Fehler</a></li>
+        <li><a class="review-nav-link" href="calculator.html" aria-current="page">Interaktiv</a></li>
+      </ul>
+    </nav>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var ICON = '<svg class="error-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5 15 14.5H1L8 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6.5v3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="12.2" r="0.9" fill="currentColor"/></svg>';
+
+      var FIELDS = [
+        { key: 'amount',  input: document.getElementById('amount'),  message: document.getElementById('amount-message'),  touched: false, rule: { min: 0 } },
+        { key: 'percent', input: document.getElementById('percent'), message: document.getElementById('percent-message'), touched: false, rule: { min: 0 } },
+        { key: 'people',  input: document.getElementById('people'),  message: document.getElementById('people-message'),  touched: false, rule: { min: 1, integer: true } }
+      ];
+
+      var ERRORS = {
+        amount:  'Der Betrag muss eine Zahl von 0 oder mehr sein.',
+        percent: 'Der Trinkgeld-Prozentsatz muss eine Zahl von 0 oder mehr sein.',
+        people:  'Die Personenzahl muss eine ganze Zahl von mindestens 1 sein.'
+      };
+
+      var resultRows = document.getElementById('result-rows');
+      var notice = document.getElementById('results-notice');
+      var tipNum = document.getElementById('tip-num');
+      var totalNum = document.getElementById('total-num');
+      var perPersonNum = document.getElementById('perperson-num');
+      var tipValue = document.getElementById('tip-value');
+      var totalValue = document.getElementById('total-value');
+      var perPersonValue = document.getElementById('perperson-value');
+
+      function parse(raw) {
+        var t = String(raw).trim();
+        if (t === '') return { empty: true };
+        var n = parseFloat(t.replace(',', '.'));
+        if (!isFinite(n)) return { invalid: true };
+        return { value: n };
+      }
+
+      function statusOf(raw, rule) {
+        var p = parse(raw);
+        if (p.empty) return 'empty';
+        if (p.invalid) return 'invalid';
+        if (rule.min != null && p.value < rule.min) return 'invalid';
+        if (rule.integer && Math.floor(p.value) !== p.value) return 'invalid';
+        return 'valid';
+      }
+
+      function round2(x) {
+        return Math.round((x + Number.EPSILON) * 100) / 100;
+      }
+
+      function fmt(x) {
+        return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(x);
+      }
+
+      function setResult(valueEl, numEl, value, isPlaceholder) {
+        numEl.textContent = isPlaceholder ? '0,00' : fmt(value);
+        valueEl.classList.toggle('is-placeholder', isPlaceholder);
+      }
+
+      function update() {
+        var states = FIELDS.map(function (f) {
+          return { field: f, status: statusOf(f.input.value, f.rule) };
+        });
+
+        var invalidShown = false;
+        states.forEach(function (s) {
+          var show = s.status === 'invalid' && s.field.touched;
+          if (show) invalidShown = true;
+          s.field.input.classList.toggle('is-invalid', show);
+          s.field.input.setAttribute('aria-invalid', show ? 'true' : 'false');
+          if (show) {
+            s.field.message.innerHTML = ICON + '<span>' + ERRORS[s.field.key] + '</span>';
+            s.field.message.classList.add('is-error');
+          } else {
+            s.field.message.innerHTML = '';
+            s.field.message.classList.remove('is-error');
+          }
+        });
+
+        if (invalidShown) {
+          resultRows.hidden = true;
+          notice.hidden = false;
+          return;
+        }
+
+        notice.hidden = true;
+        resultRows.hidden = false;
+
+        var amount = states[0], percent = states[1], people = states[2];
+
+        if (amount.status === 'valid' && percent.status === 'valid' && people.status === 'valid') {
+          var amt = parse(amount.field.input.value).value;
+          var pct = parse(percent.field.input.value).value;
+          var ppl = parse(people.field.input.value).value;
+          var tip = round2(amt * pct / 100);
+          var total = round2(amt + tip);
+          var perPerson = round2(total / ppl);
+          setResult(tipValue, tipNum, tip, false);
+          setResult(totalValue, totalNum, total, false);
+          setResult(perPersonValue, perPersonNum, perPerson, false);
+        } else {
+          setResult(tipValue, tipNum, 0, true);
+          setResult(totalValue, totalNum, 0, true);
+          setResult(perPersonValue, perPersonNum, 0, true);
+        }
+      }
+
+      FIELDS.forEach(function (f) {
+        f.input.addEventListener('input', update);
+        f.input.addEventListener('blur', function () {
+          f.touched = true;
+          update();
+        });
+      });
+
+      update();
+    })();
+  </script>
+</body>
+</html>
