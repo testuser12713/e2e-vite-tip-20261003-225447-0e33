@@ -286,6 +286,12 @@ body {
   color: var(--color-fgMuted);
 }
 
+.status-line {
+  margin: var(--space-2) 0 0;
+  font-size: var(--size-label);
+  color: var(--color-fgMuted);
+}
+
 @media (min-width: 640px) {
   .app {
     padding: var(--space-6) var(--space-4);

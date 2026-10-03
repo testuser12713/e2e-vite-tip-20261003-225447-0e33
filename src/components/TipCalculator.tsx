@@ -104,7 +104,7 @@ export function TipCalculator(): JSX.Element {
 
       <FieldErrors errors={errors} touched={touched} />
 
-      <ResultPanel outcome={outcome} />
+      <ResultPanel outcome={outcome} touched={touched} />
     </section>
   );
 }
